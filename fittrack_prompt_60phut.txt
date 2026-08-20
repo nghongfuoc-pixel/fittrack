@@ -1,0 +1,162 @@
+PROMPT XÂY DỰNG APP FITTRACK - DEMO 60 PHÚT (MOBILE-FIRST)
+==========================================================
+
+TỔNG QUAN
+---------
+Xây dựng ứng dụng theo dõi tập luyện thể hình tên "FitTrack", thiết kế mobile-first, giao diện tiếng Việt.
+Mục tiêu trong 60 phút: tạo được demo chạy được trên điện thoại, người dùng có thể:
+- Bắt đầu buổi tập
+- Ghi weight / reps / sets
+- Tính tổng volume
+- Lưu buổi tập (local / mock) và xem lại được
+- Xem lịch sử buổi tập (Log)
+
+Ưu tiên trải nghiệm ghi tập mượt + dữ liệu được lưu (ít nhất trong phiên demo). Các tính năng nâng cao (biểu đồ phức tạp, CRUD routine đầy đủ, calendar, PR chi tiết...) làm đơn giản hoặc bỏ qua nếu hết thời gian.
+
+YÊU CẦU KỸ THUẬT
+---------------
+- Framework: TanStack Start (React 19, Vite 7)
+- Styling: Tailwind CSS v4, mobile-first, design tokens
+- Backend / Deploy:
+  - Không sử dụng Lovable Cloud
+  - Code quản lý hoàn toàn qua GitHub
+  - Trong 60 phút demo: dùng local state + localStorage (hoặc mock data) để lưu workout
+  - Sau này sẽ tìm cách gắn database thật và deploy lên Render (hoặc dịch vụ tương đương: Railway, Fly.io, Vercel…)
+- State: useState + localStorage (đơn giản cho demo)
+- Forms: React Hook Form + Zod (dùng mức cơ bản nếu cần)
+- Icons: Lucide React
+- Charts: Tạm thời không bắt buộc
+- Ngôn ngữ giao diện: Tiếng Việt 100%
+
+THIẾT KẾ UI/UX MOBILE-FIRST
+--------------------------
+Navigation: Bottom tab bar 5 tab (thumb-friendly):
+1. Home
+2. Routines
+3. Log
+4. Stats
+5. Profile
+
+Các nút đủ lớn để chạm, ưu tiên trải nghiệm điện thoại.
+
+CÁC MÀN HÌNH CHÍNH (PHIÊN BẢN DEMO)
+-----------------------------------
+1. Home:
+   - Tiêu đề "Xin chào"
+   - Nút CTA lớn: "Bắt đầu tập ngay"
+   - Buổi tập gần nhất (nếu có)
+
+2. Active Workout:
+   - Chọn bài tập (danh sách mẫu sẵn)
+   - Thêm / xóa set
+   - Mỗi set: weight (kg), reps, checkbox hoàn thành
+   - Nút "Hoàn thành buổi tập" → tính total volume → lưu vào localStorage
+
+3. Routines:
+   - Hiển thị 1–2 routine mẫu (hardcode)
+   - Nút "Tập routine này" → chuyển sang Active Workout
+
+4. Log:
+   - Danh sách buổi tập đã lưu (ngày, total volume, số bài)
+   - Xem chi tiết buổi tập
+   - Dữ liệu lấy từ localStorage
+
+5. Stats & Profile:
+   - Placeholder đơn giản (tiêu đề + text "Đang phát triển")
+
+CẤU TRÚC DỮ LIỆU (CHO DEMO – LOCALSTORAGE)
+------------------------------------------
+Lưu dưới dạng JSON trong localStorage, cấu trúc gần với database thật để dễ chuyển sau này:
+
+Workout object:
+{
+  id: string (uuid hoặc timestamp),
+  name: string,
+  startedAt: string (ISO),
+  completedAt: string (ISO),
+  totalVolume: number,
+  durationSeconds: number,
+  exercises: [
+    {
+      exerciseId: string,
+      exerciseName: string,
+      sets: [
+        { setNumber: number, weight: number, reps: number, completed: boolean }
+      ]
+    }
+  ]
+}
+
+Danh sách exercises mẫu (hardcode):
+- Bench Press, Squat, Deadlift, Overhead Press, Barbell Row, Pull-up…
+
+LƯU Ý DỮ LIỆU
+-------------
+- Luôn lưu weight theo kg
+- totalVolume = tổng (weight × reps) của các set đã hoàn thành
+- Dùng localStorage để dữ liệu còn sau khi reload trang
+- Cấu trúc dữ liệu viết sẵn để sau này dễ chuyển sang PostgreSQL khi deploy lên Render
+
+LỘ TRÌNH THỰC HIỆN (TỔNG 60 PHÚT – MỖI GIAI ĐOẠN ~10 PHÚT)
+----------------------------------------------------------
+
+GIAI ĐOẠN 1: Khung app + Bottom Tab (10 phút)
+- Tạo project TanStack Start
+- Cấu hình Tailwind + theme mobile-first
+- Tạo bottom tab bar 5 tab: Home / Routines / Log / Stats / Profile
+- Mỗi tab là trang trống có tiêu đề tiếng Việt
+→ Kết quả: Chuyển tab được, giao diện giống app mobile
+
+GIAI ĐOẠN 2: Home + Nút bắt đầu tập (10 phút)
+- Màn Home: tiêu đề "Xin chào", nút lớn "Bắt đầu tập ngay"
+- Click nút → chuyển sang màn Active Workout (chưa có logic)
+→ Kết quả: Có luồng bắt đầu tập
+
+GIAI ĐOẠN 3: Active Workout – nhập set cơ bản (10 phút)
+- Danh sách bài tập mẫu (hardcode 4–6 bài)
+- Chọn bài → hiện danh sách set
+- Thêm / xóa set
+- Input weight + reps
+- Checkbox hoàn thành set
+→ Kết quả: Có thể ghi weight/reps trong buổi tập
+
+GIAI ĐOẠN 4: Tính volume + Hoàn thành buổi tập (10 phút)
+- Khi bấm "Hoàn thành buổi tập":
+  - Tính total_volume = Σ (weight × reps)
+  - Lưu object workout vào localStorage
+- Hiển thị tổng volume sau khi hoàn thành
+→ Kết quả: Thấy được volume và dữ liệu được lưu tạm
+
+GIAI ĐOẠN 5: Màn Log – xem lịch sử (10 phút)
+- Màn Log: đọc danh sách workouts từ localStorage
+- Hiển thị ngày + total volume + số bài tập
+- Click vào 1 buổi → xem chi tiết các set
+→ Kết quả: Xem lại được lịch sử buổi tập sau khi reload
+
+GIAI ĐOẠN 6: Routines mẫu + Polish + Push GitHub (10 phút)
+- Thêm 1–2 routine mẫu (hardcode)
+- Empty state / loading đơn giản
+- Test nhanh luồng chính trên mobile
+- Commit & push code lên GitHub
+→ Kết quả: Demo hoàn chỉnh, code đã lên GitHub, sẵn sàng deploy Render sau này
+
+QUY TẮC CODE
+------------
+- Giữ code sạch, dễ mở rộng
+- Không hardcode màu sắc, dùng design tokens
+- Ưu tiên mobile, nút lớn, ít bước thao tác khi đang tập
+- Toàn bộ text giao diện bằng tiếng Việt
+- Cấu trúc dữ liệu viết gần với database thật để dễ chuyển sang Postgres sau
+
+LƯU Ý QUAN TRỌNG
+----------------
+- Đây là bản DEMO 60 phút → chấp nhận đơn giản hóa mạnh
+- Không dùng Lovable Cloud / Supabase
+- Trong demo dùng localStorage để có cảm giác “lưu được”
+- Sau này khi deploy lên Render sẽ gắn PostgreSQL (hoặc database tương đương)
+- Progressive overload thể hiện qua việc lưu weight/reps và xem lại trong Log
+- Ưu tiên luồng chính: Bắt đầu tập → Ghi set → Hoàn thành → Lưu → Xem Log
+
+MONG MUỐN CUỐI CÙNG
+--------------------
+Sau 60 phút có một demo FitTrack mobile-first bằng tiếng Việt, người dùng có thể ghi buổi tập, lưu lại và xem lịch sử. Code đã được đẩy lên GitHub, sẵn sàng tiếp tục phát triển và deploy lên Render (hoặc dịch vụ tương đương) sau này.
